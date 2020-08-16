@@ -187,43 +187,21 @@
                     function(remoteAddr, status, xhr) {
 
                         var socket = new SockJS('/chat');
-
                         stompClient = Stomp.over(socket);
-
                         stompClient.connect({username: userName}, function () {
-
                             stompClient.subscribe('/topic/broadcast', function (output) {
-
                                 showMessage(createTextNode(JSON.parse(output.body)));
-
                             });
-
-
-
                             stompClient.subscribe('/topic/active', function () {
-
                                 updateUsers(userName);
-
                             });
-
-
-
                             stompClient.subscribe('/user/queue/messages', function (output) {
-
                                 showMessage(createTextNode(JSON.parse(output.body)));
-
                             });
-
-
-
                             sendConnection(' connected to server');
-
                             setConnected(true);
-
                         }, function (err) {
-
                             alert('error' + err);
-
                         });
 
 
@@ -253,21 +231,11 @@
                         { username: userName },
 
                         function() {
-
                             sendConnection(' disconnected from server');
-
-
-
                             stompClient.disconnect(function() {
-
                                 console.log('disconnected...');
-
                                 setConnected(false);
-
                             });
-
-
-
                         }).done(function() {
 
                             // alert('Request done!');

@@ -10,10 +10,12 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class UserInterceptor implements ChannelInterceptor {
+    private final String rejectUser = "intruder";
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor
@@ -24,9 +26,17 @@ public class UserInterceptor implements ChannelInterceptor {
                     .get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
 
             if (raw instanceof Map) {
-                Object name = ((Map) raw).get("username");
-                if (name instanceof LinkedList) {
-                    accessor.setUser(new User(((LinkedList) name).get(0).toString()));
+                Object names = ((Map) raw).get("username");
+                if (names instanceof List) {
+                    List<String> userNameLst = (List<String>)names;
+                    if (userNameLst.size()==0){
+                        throw new RuntimeException("no user");
+                    }
+                    String userName = userNameLst.get(0);
+                    if (!userName.equals(rejectUser))
+                        accessor.setUser(new User(userName));
+                    else
+                        throw new RuntimeException(String.format("user %s is not found", userName));
                 }
             }
         }

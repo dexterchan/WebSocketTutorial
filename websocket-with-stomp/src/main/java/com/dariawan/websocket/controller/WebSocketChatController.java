@@ -31,13 +31,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Controller
-
 public class WebSocketChatController implements ActiveUserChangeListener {
     // private final static Logger LOGGER = LoggerFactory.getLogger(WebSocketChatController.class);
     @Autowired
     private SimpMessagingTemplate webSocket;
-
-
 
     @Autowired
     private ActiveUserManager activeUserManager;
@@ -63,8 +60,6 @@ public class WebSocketChatController implements ActiveUserChangeListener {
         }
         webSocket.convertAndSendToUser(chatMessage.getRecipient(), "/queue/messages", message);
     }
-
-
 
     @Override
     public void notifyActiveUserChange() {
