@@ -15,7 +15,9 @@ import java.util.Map;
 
 @Component
 public class UserInterceptor implements ChannelInterceptor {
+    private final static String userNameField = "username";
     private final String rejectUser = "intruder";
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor
@@ -26,18 +28,15 @@ public class UserInterceptor implements ChannelInterceptor {
                     .get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
 
             if (raw instanceof Map) {
-                Object names = ((Map) raw).get("username");
-                if (names instanceof List) {
-                    List<String> userNameLst = (List<String>)names;
-                    if (userNameLst.size()==0){
-                        throw new RuntimeException("no user");
-                    }
-                    String userName = userNameLst.get(0);
-                    if (!userName.equals(rejectUser))
-                        accessor.setUser(new User(userName));
-                    else
-                        throw new RuntimeException(String.format("user %s is not found", userName));
+                List<String> userNameLst = ((Map<String, List<String>>) raw).get(userNameField);
+                if (userNameLst.size() == 0) {
+                    throw new RuntimeException("no user");
                 }
+                String userName = userNameLst.get(0);
+                if (!userName.equals(rejectUser))
+                    accessor.setUser(new User(userName));
+                else
+                    throw new RuntimeException(String.format("user %s is not found", userName));
             }
         }
         return message;
